@@ -10,6 +10,7 @@ import com.facebook.react.bridge.LifecycleEventListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Inet4Address;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
@@ -42,19 +43,19 @@ public class FPStaticServerModule extends ReactContextBaseJavaModule implements 
 
   private String __getLocalIpAddress() {
     try {
+      String ip = null;
+
       for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
         NetworkInterface intf = en.nextElement();
         for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
           InetAddress inetAddress = enumIpAddr.nextElement();
-          if (! inetAddress.isLoopbackAddress()) {
-            String ip = inetAddress.getHostAddress();
-            if(InetAddressUtils.isIPv4Address(ip)) {
-              Log.w(LOGTAG, "local IP: "+ ip);
-              return ip;
-            }
+          if (! inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+            ip = inetAddress.getHostAddress();
           }
         }
       }
+
+      return ip;
     } catch (SocketException ex) {
       Log.e(LOGTAG, ex.toString());
     }
