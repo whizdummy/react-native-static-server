@@ -43,19 +43,17 @@ public class FPStaticServerModule extends ReactContextBaseJavaModule implements 
 
   private String __getLocalIpAddress() {
     try {
-      String ip = null;
+      String ipFormat = "192\\.(?:168)\\.(?:1?\\d\\d?|2[0-4]\\d|25[0-5])\\.(?:1?\\d\\d?|2[0-4]\\d|25[0-5])";
 
       for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
         NetworkInterface intf = en.nextElement();
         for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
           InetAddress inetAddress = enumIpAddr.nextElement();
-          if (! inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
-            ip = inetAddress.getHostAddress();
+          if (! inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address && inetAddress.getHostAddress().matches(ipFormat)) {
+            return inetAddress.getHostAddress();
           }
         }
       }
-
-      return ip;
     } catch (SocketException ex) {
       Log.e(LOGTAG, ex.toString());
     }
